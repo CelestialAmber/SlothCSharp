@@ -8,40 +8,46 @@ namespace SlothCSharp
     {
         public static void Main(string[] args)
         {
-            if (args.Length < 2){
-                Console.WriteLine("Usage: SlothCSharp filename time(ms,s,m,h; e.g. 30ms for 30 milliseconds)");
+            if (args.Length < 1){
+                Console.WriteLine("Usage: SlothCSharp filename (custom time (ms/s/m/h), default is 10ms)");
             }else{
                 byte[] bytes = File.ReadAllBytes(args[0]);
-                string timeString = args[1];
-                string timeType;
-                int time;
+                TimeSpan time;
 
-                if (timeString.Contains("ms"))
+                if (args.Length == 2)
                 {
-                    timeType = "ms";
-                    timeString = timeString.Replace("ms", "");
-                }else if (timeString.Contains("s"))
-                {
-                    timeType = "s";
-                    timeString = timeString.Replace("s", "");
-                }
-                else if (timeString.Contains("m"))
-                {
-                    timeType = "m";
-                    timeString = timeString.Replace("m", "");
-                }
-                else if (timeString.Contains("h"))
-                {
-                    timeType = "h";
-                    timeString = timeString.Replace("h", "");
+                    string timeString = args[1];
+
+                    if (timeString.Contains("ms"))
+                    {
+                        timeString = timeString.Replace("ms", "");
+                        time = TimeSpan.FromMilliseconds(int.Parse(timeString));
+                    }
+                    else if (timeString.Contains("s"))
+                    {
+                        timeString = timeString.Replace("s", "");
+                        time = TimeSpan.FromSeconds(int.Parse(timeString));
+                    }
+                    else if (timeString.Contains("m"))
+                    {
+                        timeString = timeString.Replace("m", "");
+                        time = TimeSpan.FromMinutes(int.Parse(timeString));
+                    }
+                    else if (timeString.Contains("h"))
+                    {
+                        timeString = timeString.Replace("h", "");
+                        time = TimeSpan.FromHours(int.Parse(timeString));
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid time input.");
+                        return;
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("Invalid time input.");
-                    return;
+                    time = TimeSpan.FromMilliseconds(10);
                 }
-
-                time = int.Parse(timeString);
 
                 int index = 0;
 
@@ -49,21 +55,7 @@ namespace SlothCSharp
                 {
                     Console.Write((char)bytes[index]);
                     index++;
-                    switch (timeType)
-                    {
-                        case "ms":
-                        Thread.Sleep(TimeSpan.FromMilliseconds(time));
-                        break;
-                        case "s":
-                        Thread.Sleep(TimeSpan.FromSeconds(time));
-                        break;
-                        case "m":
-                        Thread.Sleep(TimeSpan.FromMinutes(time));
-                        break;
-                        case "h":
-                        Thread.Sleep(TimeSpan.FromHours(time));
-                        break;
-                    }
+                    Thread.Sleep(time);
                 }
             }
         }
